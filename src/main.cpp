@@ -4,7 +4,7 @@
 //extern void pwm_init();
 //extern void pwm__handle();
 
-void disp_val(String str);
+void disp_val(int val);
 void state_logo();
 
 //I2C for SH1106 OLED 128x64
@@ -19,6 +19,11 @@ void setup() {
   u8g2.begin();
   state_logo();
   delay(2000);
+  disp_val(999);
+  delay(2000);
+  disp_val(55);
+  delay(2000);
+  disp_val(0);
 
   //ble_server_init();
 }
@@ -35,14 +40,13 @@ void state_logo(){
 }
 
 
-//получаемую от сервера BLE строку - выдать на дисплей
-void disp_val(String str){
-  int n = str.length(); 
-  String fstr = str.substring(0,n-5); //удалить "°C\r\n" в конце строки..
-  int val = fstr.toInt(); //входящую строку в число..
+//целое число - выдать на дисплей
+void disp_val(int val){
   String str_value ="---";
-  if (val > -40 && val < 150 && str[n-5]==194 && str[n-4]==176){  //проверяем..
+  if (val >=0 && val <= 999){  //проверяем..
     str_value = String(val);
+    if (val>=0 && val <= 9) str_value = "  "+str_value;
+    if (val>=10 && val <= 99) str_value = " "+str_value;
   }
   u8g2.clearBuffer();					// clear display buffer
   u8g2.setFont(u8g2_font_logisoso62_tn);//big font
