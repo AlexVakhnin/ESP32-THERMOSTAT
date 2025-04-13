@@ -3,6 +3,7 @@
 
 //extern void pwm_init();
 //extern void pwm__handle();
+extern void ble_setup();
 
 void disp_val(int val);
 void state_logo();
@@ -19,13 +20,13 @@ void setup() {
   u8g2.begin();
   state_logo();
   delay(2000);
-  disp_val(999);
-  delay(2000);
-  disp_val(55);
-  delay(2000);
+//  disp_val(999);
+//  delay(2000);
+//  disp_val(55);
+//  delay(2000);
   disp_val(0);
 
-  //ble_server_init();
+  ble_setup(); //start BLE server + load from NVRAM
 }
 
 void loop() {
