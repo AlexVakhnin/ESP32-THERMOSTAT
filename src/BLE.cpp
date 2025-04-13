@@ -202,21 +202,21 @@ void storage_dev_name(String dname){
 
 void storage_pid_kp(String su){
     pid_kp = su.toFloat();
-    ble_handle_tx("new pid_kp="+String(pid_kp)); //ответ на BLE
+    ble_handle_tx("new pid_kp="+String(pid_kp)+"\r\n"); //ответ на BLE
     preferences.begin("EspNvram", false);
     preferences.putFloat("pid_kp", pid_kp);
     preferences.end();
   }
   void storage_pid_ki(String su){
     pid_ki = su.toFloat();
-    ble_handle_tx("new pid_ki="+String(pid_ki)); //ответ на BLE
+    ble_handle_tx("new pid_ki="+String(pid_ki)+"\r\n"); //ответ на BLE
     preferences.begin("EspNvram", false);
     preferences.putFloat("pid_ki", pid_ki);
     preferences.end();
   }
   void storage_pid_kd(String su){
     pid_kd = su.toFloat();
-    ble_handle_tx("new pid_kd="+String(pid_kd)); //ответ на BLE
+    ble_handle_tx("new pid_kd="+String(pid_kd)+"\r\n"); //ответ на BLE
     preferences.begin("EspNvram", false);
     preferences.putFloat("pid_kd", pid_kd);
     preferences.end();
