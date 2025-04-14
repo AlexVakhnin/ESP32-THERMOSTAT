@@ -1,12 +1,16 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 
-//extern void pwm_init();
-//extern void pwm__handle();
 extern void ble_setup();
+extern void pwm_setup();
+extern void pwm_handle();
 
 void disp_val(int val);
 void state_logo();
+
+unsigned long time_now=0;
+unsigned long time_last=0;
+
 
 //I2C for SH1106 OLED 128x64
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
@@ -20,17 +24,16 @@ void setup() {
   u8g2.begin();
   state_logo();
   delay(2000);
-//  disp_val(999);
-//  delay(2000);
-//  disp_val(55);
-//  delay(2000);
   disp_val(0);
 
   ble_setup(); //start BLE server + load from NVRAM
+  pwm_setup();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  
+
+  pwm_handle();
 }
 
 void state_logo(){
