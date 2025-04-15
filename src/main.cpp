@@ -1,59 +1,65 @@
 #include <Arduino.h>
-#include <U8g2lib.h>
 
+#define PID_INTERVAL 1000//200  //(в милисекундах) период  для PID алгоритма
+
+extern void disp_setup();
+extern void state_logo();
+extern void disp_val(int val);
 extern void ble_setup();
 extern void pwm_setup();
 extern void pwm_handle();
+extern void setHeatPowerPercentage(float power);
 
-void disp_val(int val);
-void state_logo();
+extern int target_val;
+extern float heatcycles;
 
-unsigned long time_now=0;
-unsigned long time_last=0;
+long time_now=0; //текущее время в цикле
+long time_last=0; //хранит аремя для периодического события PID алгоритма
 
-
-//I2C for SH1106 OLED 128x64
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+int counter = 0;
 
 
 
 void setup() {
   Serial.begin(115200);
 
-  //OLED SH1106 128x64
-  u8g2.begin();
-  state_logo();
-  delay(2000);
-  disp_val(0);
+  disp_setup();
 
   ble_setup(); //start BLE server + load from NVRAM
   pwm_setup();
+
+  time_now=millis();
+  time_last=time_now;
+
 }
 
+//программно реализуем PWM..
 void loop() {
-  
-
-  pwm_handle();
-}
-
-void state_logo(){
-  u8g2.clearBuffer();					// clear display buffer
-  u8g2.setFont(u8g2_font_open_iconic_embedded_4x_t);//open iconic
-  u8g2.drawStr(48,64-15,"N");
-  u8g2.sendBuffer();
-}
+  time_now=millis();
 
 
-//целое число - выдать на дисплей
-void disp_val(int val){
-  String str_value ="---";
-  if (val >=0 && val <= 999){  //проверяем..
-    str_value = String(val);
-    if (val>=0 && val <= 9) str_value = "  "+str_value;
-    if (val>=10 && val <= 99) str_value = " "+str_value;
+  if((time_now-time_last)>=PID_INTERVAL or time_last > time_now) { //обработка PID алгоритма
+    /*
+    if( !overShootMode && abs(gTargetTemp-currentTemp)>=gOvershoot ) {        
+      ESPPID.SetTunings(gaP, gaI, gaD);
+      overShootMode=true;
+    }
+    else if( overShootMode && abs(gTargetTemp-currentTemp)<gOvershoot ) {
+      ESPPID.SetTunings(gP,gI,gD);
+      overShootMode=false;
+    }
+
+    if(ESPPID.Compute()==true) {   //если вычислено новое значение PWM
+      setHeatPowerPercentage(gOutputPwr); //Устанавливаем мощность нагрева (0-1000)
+    }
+    */
+    setHeatPowerPercentage(target_val);  //тест - меандр..
+    time_last=time_now;
+    //Serial.println("Event-PID Computing.."+String(counter++)+" "+String(heatcycles));
   }
-  u8g2.clearBuffer();					// clear display buffer
-  u8g2.setFont(u8g2_font_logisoso62_tn);//big font
-  u8g2.drawStr(2,63,str_value.c_str());
-  u8g2.sendBuffer();
+
+
+  //pwm_handle();
+  //delay(20);
 }
+
