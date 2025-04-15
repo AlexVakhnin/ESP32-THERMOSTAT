@@ -24,13 +24,11 @@ void setup() {
   Serial.begin(115200);
 
   disp_setup();
-
   ble_setup(); //start BLE server + load from NVRAM
   pwm_setup();
 
   time_now=millis();
   time_last=time_now;
-
 }
 
 //программно реализуем PWM..
@@ -59,7 +57,6 @@ void loop() {
   }
 
 
-  //pwm_handle();
-  //delay(20);
+  pwm_handle();
 }
 

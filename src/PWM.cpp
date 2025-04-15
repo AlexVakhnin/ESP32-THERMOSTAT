@@ -10,8 +10,8 @@ extern unsigned long time_now;
 int target_val = 0;
 int current_val = 0;
 
-float heatcycles; //время в милисекундах верхней полки PWM (0-1000) 
-bool relayState = 0; //содержит текущее состояние реле (0/1)
+float heatcycles; //время в милисекундах верхней полки PWM (0-1000) - мощность нагрева !!!
+bool pwmState = 0; //содержит текущее состояние выхода PWM (0/1)
 unsigned long heatCurrentTime = 0;  //для вычисления интервалов PWM
 unsigned long heatLastTime = 0;  //для вычисления интервалов PWM
 
@@ -23,7 +23,7 @@ void pwm_setup() {
 //меняем состояние нагревателя 
 void _turnHeatElementOnOff(bool state) {
     digitalWrite(RELAY_PIN, state);
-    relayState = state;
+    pwmState = state;
     //Serial.println("Set Relay="+String(state));
 }
 //---------------------------------------------LOOP--------------------------------------
@@ -37,22 +37,20 @@ void pwm_handle() {
     // начинаем новый период PWM !!!
     shouldUpdate = true; //нужно обновить
     newStatus = true;  //обновить - включить
-    Serial.println("__/-- "+String(PWM_PERIOD)+" "+String(heatCurrentTime)+"-"+String(heatLastTime)+"="+String(heatCurrentTime - heatLastTime));
+    Serial.println("__/-- "+String(heatCurrentTime)+"-"+String(heatLastTime)+"="+String(heatCurrentTime - heatLastTime));
     heatLastTime = heatCurrentTime;
   }
-/*
-  // проверка выхода за временные пределы верхней (горячей) полки PWM
-  if (heatCurrentTime - heatLastTime >= heatcycles && shouldUpdate==false && heaterState==1) {
+
+  // проверка выхода за временные пределы верхней полки PWM
+  if (heatCurrentTime - heatLastTime >= heatcycles &&  pwmState==1) {
     shouldUpdate = true; //нужно обновить
     newStatus = false;  //обновить - выключить
-    //delay(20);
-    Serial.println("--\\__ "+String(heatcycles)+" "+String(heatCurrentTime)+"-"+String(heatLastTime)+"="+String(heatCurrentTime - heatLastTime));
+    Serial.println("--\\__ "+String(heatCurrentTime)+"-"+String(heatLastTime)+"="+String(heatCurrentTime - heatLastTime));
   }
-*/
+
   //меняем состояние выхода PWM (0/1)
   if(shouldUpdate){
     _turnHeatElementOnOff(newStatus);
-    shouldUpdate=false;
   }
 }
 //---------------------------------------------END LOOP--------------------------------
